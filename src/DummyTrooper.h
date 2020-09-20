@@ -7,18 +7,17 @@
 
 
 #include <SDL2/SDL_render.h>
-#include "DummyVector.h"
 
 class DummyTrooper {
 private:
     float x, y;
     float collisionRadius = 5.0f;
-    DummyVector* direction;
+    float angle = 90.0f;
 public:
     DummyTrooper(float x, float y);
     float getX() const {return this->x;}
     float getY() const {return this->y;}
-    DummyVector* getMovementDirection() const { return this->direction; };
+    float getAngle() const {return this->angle;}
     void render(SDL_Renderer* renderer);
     void rotate(float angle);
     void move(float position);

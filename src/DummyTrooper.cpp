@@ -7,13 +7,17 @@
 DummyTrooper::DummyTrooper(float x, float y) {
     this->x = x;
     this->y = y;
-    this->direction = new DummyVector(1,1);
 }
 
+//todo refactor
 void DummyTrooper::render(SDL_Renderer *renderer) {
+    auto angleRadian = angle * M_PI / 180.0f;
+
     SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
-    SDL_RenderDrawLine(renderer, direction->getX() + x, direction->getY() + y,
-                       (direction->getX() * 100) + x,(direction->getY() * 100) + y);
+    SDL_RenderDrawLine(renderer, this->x,
+                       this->y,
+                       this->x + (sinf(angleRadian) * 10.0f),
+                       this->y + (cosf(angleRadian) * 10.0f));
 
     for (int w = 0; w < collisionRadius * 2; w++)
     {
@@ -30,10 +34,11 @@ void DummyTrooper::render(SDL_Renderer *renderer) {
 }
 
 void DummyTrooper::rotate(float angle) {
-    direction->rotate(angle);
+    this->angle -= angle;
 }
 
 void DummyTrooper::move(float position) {
-    x += direction->getX();
-    y += direction->getY();
+    auto angleRadian = angle * M_PI / 180.0f;
+    this->x += sinf(angleRadian) * position;
+    this->y += cosf(angleRadian) * position;
 }

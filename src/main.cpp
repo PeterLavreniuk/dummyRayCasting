@@ -47,6 +47,16 @@ int main() {
         clear();
         return 0;
     }
+    auto map = new GameMap();
+    map->loadMap();
+    auto trooper = new DummyTrooper(128, 128);
+
+    auto rcRenderer = new RcRenderer(map, trooper);
+    if(!rcRenderer->initialize(gRenderer)){
+        std::cout << "init failed" << std::endl;
+        clear();
+        return 0;
+    }
 
     auto quit = false;
     SDL_Event e;
@@ -56,24 +66,35 @@ int main() {
 
     const Uint8* state = SDL_GetKeyboardState(NULL);
 
-    auto map = new GameMap();
-    auto trooper = new DummyTrooper(128, 128);
-    auto rcRenderer = new RcRenderer(map, trooper);
     SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_BLEND);
+
+    SDL_Rect debugViewPort = {
+            0,
+            0,
+            SCREEN_WIDTH / 2,
+            SCREEN_HEIGHT /2
+    };
+
+    SDL_Rect gameViewPort = {
+            SCREEN_WIDTH / 2,
+            0,
+            SCREEN_WIDTH / 2,
+            SCREEN_HEIGHT
+    };
 
     while(!quit){
         if(state[SDL_SCANCODE_ESCAPE]){
             quit = true;
         }
 
-        if (state[SDL_SCANCODE_UP]) {
-            trooper->move(1.0f);
+        if (state[SDL_SCANCODE_UP] || state[SDL_SCANCODE_W]) {
+            trooper->move(5.0f);
         }
-        if (state[SDL_SCANCODE_LEFT]) {
-            trooper->rotate(-4.0f);
+        if (state[SDL_SCANCODE_LEFT] || state[SDL_SCANCODE_A]) {
+            trooper->rotate(-2.0f);
         }
-        if (state[SDL_SCANCODE_RIGHT]) {
-            trooper->rotate(4.0f);
+        if (state[SDL_SCANCODE_RIGHT] || state[SDL_SCANCODE_D]) {
+            trooper->rotate(2.0f);
         }
 
         while(SDL_PollEvent(&e) != 0){
@@ -84,9 +105,17 @@ int main() {
         SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0x00, 0x00);
         SDL_RenderClear(gRenderer);
 
+        //debug viewport
+        SDL_RenderSetViewport(gRenderer, &debugViewPort);
+        rcRenderer->renderDebug(gRenderer);
         map->render(gRenderer);
         trooper->render(gRenderer);
+        //end of debug viewport
+
+        //game viewport
+        SDL_RenderSetViewport(gRenderer, &gameViewPort);
         rcRenderer->render(gRenderer);
+        //end of game viewport
 
         SDL_RenderPresent(gRenderer);
 
